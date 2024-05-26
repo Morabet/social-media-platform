@@ -1,0 +1,21 @@
+-- Create user if it does not exist
+DO $$ BEGIN
+   IF EXISTS (
+      SELECT FROM pg_catalog.pg_roles
+      WHERE  rolname = 'sg_test_user') THEN
+      RAISE NOTICE 'Role "sg_test_user" already exists. Skipping.';
+   ELSE
+      CREATE ROLE sg_test_user LOGIN PASSWORD 'sg_test_pwd';
+   END IF;
+END $$;
+
+-- Create database if it does not exist
+DO $$ BEGIN
+    PERFORM datname FROM pg_catalog.pg_database WHERE datname = 'sg_test_db';
+    IF NOT FOUND THEN
+        EXECUTE 'CREATE DATABASE sg_test_db';
+    END IF;
+END $$;
+
+-- Grant privileges to a user on the database
+GRANT ALL PRIVILEGES ON DATABASE sg_test_db TO sg_test_user;
